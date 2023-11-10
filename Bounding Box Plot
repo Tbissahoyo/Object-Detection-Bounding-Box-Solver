@@ -1,0 +1,90 @@
+import os
+import json
+import numpy as np
+import pandas as pd
+from PIL import Image
+import pathlib as path
+from shapely import box, LineString, Polygon, normalize, union_all
+import shapely.geometry
+import matplotlib.pyplot as plt
+import geopandas
+
+# take in json files
+# image_files = open("path file for predictions")
+bbox_data = 0
+list_for_plot = []
+list_x = []
+list_y = []
+list_of_unions = []
+list_for_union_boxes = []
+list_of_num_union = []
+list_of_boxes = []
+scores = []
+number_for_union = []
+
+i, j = 0, 0
+boxes = 0
+
+
+def image_coord():
+    img = Image.open(image_path)
+    width, height = img.size
+
+    area_img = width * height
+    # makes box for image
+    img_box = [[0, 0], [0, height], [width, height], [width, 0]]
+
+    img_box.append(img_box[0])
+    x_img, y_img = zip(*img_box)
+    plt.plot(x_img, y_img)
+
+
+def calc_score():
+    score = 1 - (area_box / area_img)
+    return score
+
+
+with open(
+        '/Users/trin/PycharmProjects/People detection/Second_try_last_rmdt_x_configurations/preds/459230363_9465fc2e32_o.json') as json_file:
+    json_data = json.load(json_file)
+    data_scores = json_data["scores"]
+    data_bbox = json_data["bboxes"]
+
+image_path = "/Users/trin/PycharmProjects/People detection/Second_try_last_rmdt_x_configurations/vis/459230363_9465fc2e32_o.jpg"
+
+for items in data_scores:  # checking for scores in scores list
+    if i < len(data_scores):
+        if items > 0.30:
+            j += 1  # used for the next step, j should equal the length of the scores collected
+    i += 1
+
+i = 0  # resets i to 0
+plt.figure()
+for items in data_bbox:
+    if boxes <= j:
+        xmin, ymin, xmax, ymax = (data_bbox[boxes][0:4])  # grabs the coordinates from specified box in bboxes
+        pts_of_box = box(xmin, ymin, xmax, ymax)  # makes the box
+
+        list_of_boxes.append(
+            list(pts_of_box.centroid.coords[:]))  # collects the centroid to get centroid to place the name of the box
+
+        coord_of_box = list(pts_of_box.exterior.coords)  # turns into coordinates
+
+        list_for_plot.append(coord_of_box)  # adds to the list before plotting
+        boxes += 1
+
+        if boxes == j:  # will only run once we collect the correct number of boxes
+            for exteriors in list_for_plot:
+                if i <= len(list_for_plot):
+                    list_for_plot[i].append(list_for_plot[i][0])  # repeat the first point to create a 'closed loop'
+                    x, y = zip(*list_for_plot[i])  # creates x and y for each coordinate
+                    centroid_x, centroid_y = list(list_of_boxes[i][0])[0], list(list_of_boxes[i][0])[1]
+
+                    plt.text(centroid_x, centroid_y, i)
+                    plt.plot(x, y)
+                    i += 1
+
+                    # ----------------------------------- section is done up
+image_coord()
+plt.gca().invert_yaxis()  # inverts coordinates that way it matches the photo x,y axis
+plt.show()
