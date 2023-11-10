@@ -1,0 +1,89 @@
+from openpyxl import load_workbook as xl
+import pandas as pd
+import csv
+
+#First File
+File_one = pd.read_csv('Full file path')
+
+#Second File
+File_two = pd.read_csv('/Users/trin/PycharmProjects/parent-child_sorting/tiktok_ids.csv')
+
+# you do not need to do this
+final = File_one.reindex(['Specific Column', 'Specific Column Name']) # makes data table with specific columns of information of your choice
+
+
+#print(final) -> error check
+
+#make arrays to hold data you want to collect
+list_of_video_ids = []
+list_of_tiktok_ids = []
+list_of_data_ids_parents = []
+list_of_data_ids_children = []
+
+# final list with compared items within them
+final_list_of_parents = []
+final_list_of_children = []
+titles = []
+view_count = []
+like_count = []
+comment_count = []
+video_length = []
+
+video_id = without_distinction_file[[
+    'video_id', 'title', 'view_count', 'like_count', 'comment_count', 'video_length']].values.tolist()
+
+tik_tok = tik_tok_ids['Tik_tok_ids'].values.tolist()
+
+
+# grabs all the video ids from social media bit bucket file
+for data in tik_tok:
+    list_of_tiktok_ids.append(data)
+
+
+# print(list_of_data_ids)
+
+# gathers data from the Excel file and finds which ids are labeled parent or child
+data_id = whole_data_file[['Video ID', 'Is the video aimed at parents or children?']].values.tolist()
+
+for items in data_id:
+    #print(items[0])
+
+    if items[1] == 'Parents':
+        list_of_data_ids_parents.append(items[0])
+        #print("Parent")
+
+    if items[1] == 'Children':
+        list_of_data_ids_children.append(items[0])
+        # print("Children")
+
+# compare the list to see which are parent and which are not
+# if the list only contains numbers make sure to type cast to a string
+
+for items in list_of_tiktok_ids:
+    for video_ids_p in list_of_data_ids_parents:
+        if str(items) == video_ids_p:
+            final_list_of_parents.append(video_ids_p)
+
+    for video_ids_c in list_of_data_ids_children:
+        if str(items)== video_ids_c:
+            final_list_of_children.append(video_ids_c)
+
+final_sheet = pd.DataFrame(tik_tok_ids)
+final_sheet['Tik_tok_ids'] = final_sheet['Tik_tok_ids'].astype(str)
+final_sheet['Parent or Child'] = ''
+
+
+it = 0
+
+for item in final_sheet['Tik_tok_ids']:
+    if str(item) in final_list_of_parents and item in final_list_of_children:
+        final_sheet.at[it, 'Parent or Child'] = 'both'
+    elif str(item) in final_list_of_children and item not in final_list_of_parents:
+        final_sheet.at[it, 'Parent or Child'] = 'children'
+    elif str(item) in final_list_of_parents and item not in final_list_of_children:
+        final_sheet.at[it, 'Parent or Child'] = 'parent'
+
+    it += 1
+
+print(final_list_of_parents)
+final_sheet.to_excel("Output_file.xlsx")
