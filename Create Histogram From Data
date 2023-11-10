@@ -1,0 +1,34 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+from collections import Counter
+
+
+def histogram(excel_path):
+    # grabs scores from data file
+    dynamic_coverage = pd.read_excel(excel_path)  # will need to put path of Excel file
+    score = dynamic_coverage.loc[dynamic_coverage["Score"] <= 1]
+    print(score["Score"])
+
+    fig = plt.figure(figsize=(22, 8))
+    scores, bins, patches = plt.hist(x=score["Score"], bins=15, color='#8e7c60', rwidth=0.85)
+
+    plt.grid(axis='y', alpha=0.5)
+
+    plt.title('BBOX dynamic coverage')
+    plt.xlabel('Dynamic coverage score')
+    plt.ylabel('Frequency')
+    plt.text(23, 45, r'$\mu=15, b=3$')
+    plt.ylim()
+    print(bins)
+
+    # x ticks
+    xticks = [(bins[idx + 1] + value) / 2 for idx, value in enumerate(bins[:-1])]
+    xticks_labels = ["{:.2f}-{:.2f}".format(value, bins[idx + 1]) for idx, value in enumerate(bins[:-1])]
+    plt.xticks(xticks, labels=xticks_labels, fontsize=9)
+    # plot values on top of bars
+    for idx, value in enumerate(scores):
+        if value > 0:
+            plt.text(xticks[idx], value + 1, int(value), ha='center')
+
+    plt.show()
