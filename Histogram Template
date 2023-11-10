@@ -11,16 +11,16 @@ def histogram(excel_path):
     print(score["Score"])
 
     fig = plt.figure(figsize=(22, 8))
-    scores, bins, patches = plt.hist(x=score["Score"], bins=15, color='#8e7c60', rwidth=0.85)
+    scores, bins, patches = plt.hist(x=score["Score"], bins=15, color='#8e7c60', rwidth=0.85) #X is your independent variable
 
     plt.grid(axis='y', alpha=0.5)
 
-    plt.title('BBOX dynamic coverage')
-    plt.xlabel('Dynamic coverage score')
-    plt.ylabel('Frequency')
-    plt.text(23, 45, r'$\mu=15, b=3$')
+    plt.title('BBOX dynamic coverage') # Title Name
+    plt.xlabel('Dynamic coverage score') # X-axis Lable
+    plt.ylabel('Frequency') # Y-axis Lable
+    plt.text(23, 45, r'$\mu=15, b=3$') # Size of tect in your histogram
     plt.ylim()
-    print(bins)
+    print(bins) 
 
     # x ticks
     xticks = [(bins[idx + 1] + value) / 2 for idx, value in enumerate(bins[:-1])]
